@@ -1,82 +1,71 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
 
-#define MAX 100
-
-void removeWhiteSpaces(char* str) {
-    int i, j = 0;
-    for (i = 0; str[i]; i++) {
-        if (str[i] != ' ') {
-            str[j++] = str[i];
-        }
-    }
-    str[j] = '\0';
-}
-
-int evaluate(char *expr) {
-    int numbers[MAX], numTop = -1;
-    char ops[MAX];
-    int opTop = -1;
-    
-    int i = 0;
-    while (expr[i] != '\0') {
-        if (isdigit(expr[i])) {
-            int num = 0;
-            while (isdigit(expr[i])) {
-                num = num * 10 + (expr[i] - '0');
-                i++;
-            }
-            numbers[++numTop] = num;
-        } else {
-            if (expr[i] == '*' || expr[i] == '/') {
-                char op = expr[i++];
-                int num = 0;
-                while (isdigit(expr[i])) {
-                    num = num * 10 + (expr[i] - '0');
-                    i++;
-                }
-                int a = numbers[numTop--];
-                if (op == '*') {
-                    numbers[++numTop] = a * num;
-                } else {
-                    if (num == 0) {
-                        printf("Error: Division by zero\n");
-                        return 0;
-                    }
-                    numbers[++numTop] = a / num;
-                }
-            } else {
-                ops[++opTop] = expr[i++];
-            }
-        }
-    }
-
-    int result = numbers[0];
-    int numIndex = 1;
-    for (int j = 0; j <= opTop; j++) {
-        if (ops[j] == '+') {
-            result += numbers[numIndex++];
-        } else if (ops[j] == '-') {
-            result -= numbers[numIndex++];
-        }
-    }
-    return result;
-}
-
 int main() {
-    char expr[MAX];
-    printf("Enter an expression: ");
-    fgets(expr, MAX, stdin);
-    expr[strcspn(expr, "\n")] = '\0';
-    removeWhiteSpaces(expr);
-    for (int i = 0; expr[i] != '\0'; i++){
-        if (!isdigit(expr[i]) && expr[i] != '+' && expr[i] != '-' && expr[i] != '*' && expr[i] != '/'){
-            printf("Error: Invalid expression.\n");
-            return 0;
+    char expr[100];
+    printf("Enter an arithmetic expression: ");
+    fgets(expr, sizeof(expr), stdin);
+
+    int nums[100];
+    int ops[100];
+    int numCount = 0, opCount = 0;
+    int i = 0, num = 0, hasNum = 0;
+
+    while(expr[i] != '\0' && expr[i] != '\n') {
+        if(expr[i] == ' ') {
+            i++;
+            continue;
+        }
+        if(isdigit(expr[i])) {
+            num = num * 10 + (expr[i] - '0');
+            hasNum = 1;
+        } else if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/') {
+            if(!hasNum) {
+                printf("Error: Invalid expression\n");
+                return 1;
+            }
+            nums[numCount++] = num;
+            num = 0;
+            hasNum = 0;
+            ops[opCount++] = expr[i];
+        }
+        i++;
+    }
+    if(hasNum) nums[numCount++] = num;
+
+    for(i = 0; i < opCount; i++) {
+        if(ops[i] == '*' || ops[i] == '/') {
+            if(ops[i] == '*') {
+                nums[i] = nums[i] * nums[i+1];
+            } else {
+                if(nums[i+1] == 0) {
+                    printf("Error: Division by zero\n");
+                    return 1;
+                }
+                nums[i] = nums[i] / nums[i+1];
+            }
+            for(int j = i+1; j < numCount - 1; j++) {
+                nums[j] = nums[j+1];
+            }
+            for(int j = i; j < opCount - 1; j++) {
+                ops[j] = ops[j+1];
+            }
+            numCount--;
+            opCount--;
+            i--;
         }
     }
-    int result = evaluate(expr);
+
+    int result = nums[0];
+    for(i = 0; i < opCount; i++) {
+        if(ops[i] == '+') {
+            result += nums[i+1];
+        } else {
+            result -= nums[i+1];
+        }
+    }
+
     printf("Result: %d\n", result);
     return 0;
 }
