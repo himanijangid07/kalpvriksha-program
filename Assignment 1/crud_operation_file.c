@@ -22,7 +22,7 @@ void createFile()
 
 void addUser()
 {
-    struct User u;
+    struct User userDetails;
     FILE *file = fopen("users.txt", "a");
     if (file == NULL)
     {
@@ -31,22 +31,22 @@ void addUser()
     }
 
     printf("Enter ID: ");
-    scanf("%d", &u.id);
-    getchar(); // clear newline left in buffer
+    scanf("%d", &userDetails.id);
+    getchar();
     printf("Enter Name: ");
-    fgets(u.name, sizeof(u.name), stdin);
-    u.name[strcspn(u.name, "\n")] = '\0'; // remove trailing newline
+    fgets(userDetails.name, sizeof(userDetails.name), stdin);
+    userDetails.name[strcspn(userDetails.name, "\n")] = '\0';
     printf("Enter Age: ");
-    scanf("%d", &u.age);
+    scanf("%d", &userDetails.age);
 
-    fprintf(file, "%d|%s|%d\n", u.id, u.name, u.age); // using | as separator
+    fprintf(file, "%d|%s|%d\n", userDetails.id, userDetails.name, userDetails.age);
     fclose(file);
     printf("User added successfully.\n");
 }
 
 void readUsers()
 {
-    struct User u;
+    struct User userDetails;
     FILE *file = fopen("users.txt", "r");
     if (file == NULL)
     {
@@ -59,9 +59,9 @@ void readUsers()
     char line[200];
     while (fgets(line, sizeof(line), file))
     {
-        if (sscanf(line, "%d|%49[^|]|%d", &u.id, u.name, &u.age) == 3)
+        if (sscanf(line, "%d|%49[^|]|%d", &userDetails.id, userDetails.name, &userDetails.age) == 3)
         {
-            printf("%d\t%-15s\t%d\n", u.id, u.name, u.age);
+            printf("%d\t%-15s\t%d\n", userDetails.id, userDetails.name, userDetails.age);
         }
     }
     fclose(file);
@@ -69,7 +69,7 @@ void readUsers()
 
 void deleteUser(int id)
 {
-    struct User u;
+    struct User userDetails;
     FILE *file = fopen("users.txt", "r");
     FILE *tempFile = fopen("temp.txt", "w");
     if (file == NULL || tempFile == NULL)
@@ -82,11 +82,11 @@ void deleteUser(int id)
     char line[200];
     while (fgets(line, sizeof(line), file))
     {
-        if (sscanf(line, "%d|%49[^|]|%d", &u.id, u.name, &u.age) == 3)
+        if (sscanf(line, "%d|%49[^|]|%d", &userDetails.id, userDetails.name, &userDetails.age) == 3)
         {
-            if (u.id != id)
+            if (userDetails.id != id)
             {
-                fprintf(tempFile, "%d|%s|%d\n", u.id, u.name, u.age);
+                fprintf(tempFile, "%d|%s|%d\n", userDetails.id, userDetails.name, userDetails.age);
             }
             else
             {
@@ -107,7 +107,7 @@ void deleteUser(int id)
 
 void updateUser(int id)
 {
-    struct User u;
+    struct User userDetails;
     FILE *file = fopen("users.txt", "r");
     FILE *tempFile = fopen("temp.txt", "w");
     if (file == NULL || tempFile == NULL)
@@ -120,19 +120,19 @@ void updateUser(int id)
     char line[200];
     while (fgets(line, sizeof(line), file))
     {
-        if (sscanf(line, "%d|%49[^|]|%d", &u.id, u.name, &u.age) == 3)
+        if (sscanf(line, "%d|%49[^|]|%d", &userDetails.id, userDetails.name, &userDetails.age) == 3)
         {
-            if (u.id == id)
+            if (userDetails.id == id)
             {
                 found = 1;
                 printf("Enter new Name: ");
                 getchar(); // clear newline
-                fgets(u.name, sizeof(u.name), stdin);
-                u.name[strcspn(u.name, "\n")] = '\0';
+                fgets(userDetails.name, sizeof(userDetails.name), stdin);
+                userDetails.name[strcspn(userDetails.name, "\n")] = '\0';
                 printf("Enter new Age: ");
-                scanf("%d", &u.age);
+                scanf("%d", &userDetails.age);
             }
-            fprintf(tempFile, "%d|%s|%d\n", u.id, u.name, u.age);
+            fprintf(tempFile, "%d|%s|%d\n", userDetails.id, userDetails.name, userDetails.age);
         }
     }
 
