@@ -4,33 +4,33 @@
 
 int main()
 {
-    char expr[100];
+    char expression[100];
     printf("Enter an arithmetic expression: ");
-    fgets(expr, sizeof(expr), stdin);
+    fgets(expression, sizeof(expression), stdin);
 
-    int nums[100];
-    char ops[100];
-    int numCount = 0, opCount = 0;
-    int i = 0, num = 0;
+    int numbers[100];
+    char operators[100];
+    int numberCount = 0, operatorCount = 0;
+    int index = 0, currentNumber = 0;
 
-    while (expr[i] != '\0')
+    while (expression[index] != '\0')
     {
-        if (expr[i] == ' ')
+        if (expression[index] == ' ')
         {
-            i++;
+            index++;
             continue;
         }
-        else if (isdigit(expr[i]))
+        else if (isdigit(expression[index]))
         {
-            num = num * 10 + (expr[i] - '0');
+            currentNumber = currentNumber * 10 + (expression[index] - '0');
         }
-        else if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/')
+        else if (expression[index] == '+' || expression[index] == '-' || expression[index] == '*' || expression[index] == '/')
         {
-            nums[numCount++] = num;
-            num = 0;
-            ops[opCount++] = expr[i];
+            numbers[numberCount++] = currentNumber;
+            currentNumber = 0;
+            operators[operatorCount++] = expression[index];
         }
-        else if (expr[i] == '\n')
+        else if (expression[index] == '\n')
         {
             break;
         }
@@ -39,44 +39,44 @@ int main()
             printf("Error: Invalid expression.\n");
             return 1;
         }
-        i++;
+        index++;
     }
-    nums[numCount++] = num;
+    numbers[numberCount++] = currentNumber;
 
-    for (i = 0; i < opCount; i++)
+    for (index = 0; index < operatorCount; index++)
     {
-        if (ops[i] == '*' || ops[i] == '/')
+        if (operators[index] == '*' || operators[index] == '/')
         {
-            if (ops[i] == '*')
+            if (operators[index] == '*')
             {
-                nums[i] = nums[i] * nums[i + 1];
+                numbers[index] = numbers[index] * numbers[index + 1];
             }
             else
             {
-                if (nums[i + 1] == 0)
+                if (numbers[index + 1] == 0)
                 {
                     printf("Error: Division by zero.\n");
                     return 1;
                 }
-                nums[i] = nums[i] / nums[i + 1];
+                numbers[index] = numbers[index] / numbers[index + 1];
             }
-            for (int j = i + 1; j < numCount - 1; j++)
-                nums[j] = nums[j + 1];
-            for (int j = i; j < opCount - 1; j++)
-                ops[j] = ops[j + 1];
-            numCount--;
-            opCount--;
-            i--;
+            for (int j = index + 1; j < numberCount - 1; j++)
+                numbers[j] = numbers[j + 1];
+            for (int j = index; j < operatorCount - 1; j++)
+                operators[j] = operators[j + 1];
+            numberCount--;
+            operatorCount--;
+            index--;
         }
     }
 
-    int result = nums[0];
-    for (i = 0; i < opCount; i++)
+    int result = numbers[0];
+    for (index = 0; index < operatorCount; index++)
     {
-        if (ops[i] == '+')
-            result += nums[i + 1];
+        if (operators[index] == '+')
+            result += numbers[index + 1];
         else
-            result -= nums[i + 1];
+            result -= numbers[index + 1];
     }
 
     printf("Result: %d\n", result);
