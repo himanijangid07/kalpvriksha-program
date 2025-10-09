@@ -126,7 +126,7 @@ void updateUser(int id)
             {
                 found = 1;
                 printf("Enter new Name: ");
-                getchar(); // clear newline
+                getchar();
                 fgets(userDetails.name, sizeof(userDetails.name), stdin);
                 userDetails.name[strcspn(userDetails.name, "\n")] = '\0';
                 printf("Enter new Age: ");
