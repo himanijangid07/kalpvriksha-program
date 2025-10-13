@@ -5,8 +5,8 @@ struct Student
 {
     int rollNo;
     char name[50];
-    int marks[3];
-    int totalMarks;
+    float marks[3];
+    float totalMarks;
     float averageMarks;
     char grade;
 };
@@ -42,44 +42,46 @@ void printRollNumbers(struct Student students[], int rollCount, int numberOfStud
 
 int main()
 {
-    int numberOfStudents, index, subjectIndex, rollCount;
+    int numberOfStudents, iterator, subjectIterator;
     printf("Enter number of students: ");
     scanf("%d", &numberOfStudents);
 
     struct Student students[numberOfStudents];
 
-    for (index = 0; index < numberOfStudents; index++)
+    for (iterator = 0; iterator < numberOfStudents; iterator++)
     {
-        printf("Enter details for student %d\n", index + 1);
-        printf("Enter Roll Number: ");
-        scanf("%d", &students[index].rollNo);
-        printf("Enter Name: ");
+        scanf("%d", &students[iterator].rollNo);
         getchar();
-        fgets(students[index].name, sizeof(students[index].name), stdin);
-        students[index].name[strcspn(students[index].name, "\n")] = 0;
+        fgets(students[iterator].name, sizeof(students[iterator].name), stdin);
+        students[iterator].name[strcspn(students[iterator].name, "\n")] = 0;
 
-        students[index].totalMarks = 0;
+        students[iterator].totalMarks = 0;
 
-        for (subjectIndex = 0; subjectIndex < 3; subjectIndex++)
+        for (subjectIterator = 0; subjectIterator < 3; subjectIterator++)
         {
-            printf("Enter marks for subject %d: ", subjectIndex + 1);
-            scanf("%d", &students[index].marks[subjectIndex]);
-            students[index].totalMarks += students[index].marks[subjectIndex];
+            scanf("%f", &students[iterator].marks[subjectIterator]);
+            if(students[iterator].marks[subjectIterator] < 0 || students[iterator].marks[subjectIterator] > 100)
+            {
+                printf("Invalid marks entered. Please enter marks between 0 and 100.\n");
+                subjectIterator--;
+                continue;
+            }
+            students[iterator].totalMarks += students[iterator].marks[subjectIterator];
         }
 
-        students[index].averageMarks = students[index].totalMarks / 3.0;
-        students[index].grade = calculateGrade(students[index].averageMarks);
+        students[iterator].averageMarks = students[iterator].totalMarks / 3.0;
+        students[iterator].grade = calculateGrade(students[iterator].averageMarks);
     }
     printf("--------Student Reports--------\n");
-    for (index = 0; index < numberOfStudents; index++)
+    for (iterator = 0; iterator < numberOfStudents; iterator++)
     {
-        printf("Roll Number: %d\n", students[index].rollNo);
-        printf("Name: %s\n", students[index].name);
-        printf("Total Marks: %d\n", students[index].totalMarks);
-        printf("Average Marks: %.2f\n", students[index].averageMarks);
-        printf("Grade: %c\n", students[index].grade);
+        printf("Roll Number: %d\n", students[iterator].rollNo);
+        printf("Name: %s\n", students[iterator].name);
+        printf("Total Marks: %.2f\n", students[iterator].totalMarks);
+        printf("Average Marks: %.2f\n", students[iterator].averageMarks);
+        printf("Grade: %c\n", students[iterator].grade);
         
-        switch (students[index].grade)
+        switch (students[iterator].grade)
         {
             case 'A':
                 printf("Performance: *****\n");
