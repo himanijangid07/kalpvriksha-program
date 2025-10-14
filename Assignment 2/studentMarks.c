@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#define SUBJECTS 3
+
 struct Student
 {
     int rollNo;
     char name[50];
-    float marks[3];
+    float marks[SUBJECTS];
     float totalMarks;
     float averageMarks;
     char grade;
