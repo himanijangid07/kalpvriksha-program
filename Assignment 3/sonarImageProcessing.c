@@ -34,35 +34,62 @@ void printMatrix(int *matrix, int size) {
 }
 
 void applySmoothingFilter(int *matrix, int size) {
-    int *temp = (int *)malloc(size * size * sizeof(int));
-    int row, column, rowOffset, columnOffset, sum, count;
+    int *prevRow = (int *)calloc(size, sizeof(int));
+    int *currRow = (int *)calloc(size, sizeof(int));
+
+    int row, column, sum, count, rowOffset, colOffset, neighborRow, neighborCol;
+
+    for(column = 0; column < size; column++) {
+        currRow[column] = *(matrix + column);
+    }
 
     for(row = 0; row < size; row++) {
+        int *nextRow = (row < size - 1) ? matrix + (row + 1) * size : NULL;
+
         for(column = 0; column < size; column++) {
             sum = 0;
             count = 0;
 
             for(rowOffset = -1; rowOffset <= 1; rowOffset++) {
-                for(columnOffset = -1; columnOffset <= 1; columnOffset++) {
-                    int neighborRow = row + rowOffset;
-                    int neighborColumn = column + columnOffset;
+                neighborRow = row + rowOffset;
+                if(neighborRow < 0 || neighborRow >= size) continue;
 
-                    if(neighborRow >= 0 && neighborRow < size && neighborColumn >= 0 && neighborColumn < size) {
-                        sum += *(matrix + neighborRow * size + neighborColumn);
-                        count++;
+                for(colOffset = -1; colOffset <= 1; colOffset++) {
+                    neighborCol = column + colOffset;
+                    if(neighborCol < 0 || neighborCol >= size) continue;
+
+                    if(rowOffset == -1) {
+                        sum += prevRow[neighborCol];
                     }
+                    else if(rowOffset == 0) {
+                        sum += *(matrix + row * size + neighborCol);
+                    }
+                    else if(rowOffset == 1 && nextRow != NULL) {
+                        sum += *(nextRow + neighborCol);
+                    }
+                    else {
+                        sum += *(nextRow + neighborCol);
+                    }
+                    count++;
                 }
             }
 
-            *(temp + row * size + column) = sum / count;
+            currRow[column] = sum / count;
+        }
+
+        for(column = 0; column < size; column++) {
+            *(matrix + row * size + column) = currRow[column];
+        }
+
+        if(row < size - 1) {
+            for(column = 0; column < size; column++) {
+                prevRow[column] = *(matrix + row * size + column);
+            }
         }
     }
 
-    for(int index = 0; index < size * size; index++) {
-        *(matrix + index) = *(temp + index);
-    }
-
-    free(temp);
+    free(prevRow);
+    free(currRow);
 }
 
 int main() {
