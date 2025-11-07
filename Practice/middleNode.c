@@ -30,14 +30,14 @@ struct Node* middleNode(struct Node* head) {
 }
 
 int main() {
-    int a[6] = {1, 2, 3, 4, 5, 6};
-    int n = 6;
+    int arr[6] = {1, 2, 3, 4, 5, 6};
+    int number = 6;
 
-    struct Node* head = createNode(a[0]);
+    struct Node* head = createNode(arr[0]);
     struct Node* tail = head;
 
-    for(int i=1; i<n; i++) {
-        struct Node* nextNode = createNode(a[i]);
+    for(int index=1; index<number; index++) {
+        struct Node* nextNode = createNode(arr[index]);
         tail->next = nextNode;
         tail = nextNode;
     }
