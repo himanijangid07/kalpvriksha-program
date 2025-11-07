@@ -49,23 +49,23 @@ void printList(struct Node* temp) {
 }
 
 int main() {
-    int a[5] = {1, 3, 4, 6, 7};
-    int b[5] = {1, 2, 5, 7, 8};
+    int firstArray[5] = {1, 3, 4, 6, 7};
+    int secondArray[5] = {1, 2, 5, 7, 8};
 
-    struct Node* head1 = createNode(a[0]);
+    struct Node *head1 = createNode(firstArray[0]);
     struct Node* tail1 = head1;
 
-    struct Node* head2 = createNode(b[0]);
+    struct Node *head2 = createNode(secondArray[0]);
     struct Node* tail2 = head2;
 
-    for(int i=1; i<5; i++) {
-        struct Node* nextNode = createNode(a[i]);
+    for(int index=1; index<5; index++) {
+        struct Node *nextNode = createNode(firstArray[index]);
         tail1->next = nextNode;
         tail1 = nextNode;
     }
 
-    for(int i=1; i<5; i++) {
-        struct Node* nextNode = createNode(b[i]);
+    for(int index=1; index<5; index++) {
+        struct Node *nextNode = createNode(secondArray[index]);
         tail2->next = nextNode;
         tail2 = nextNode;
     }
