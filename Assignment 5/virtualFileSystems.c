@@ -234,7 +234,7 @@ void writeCommand(char* name, char* content) {
     }
 
     int contentLength = stringLength(content);
-    int requiredBlocks = (contentLength - BLOCK_SIZE - 1) / BLOCK_SIZE;
+    int requiredBlocks = (contentLength + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
     if(requiredBlocks > countFreeBlocks(freeListHead)) {
         printf("Error: not enough free blocks\n");
@@ -403,17 +403,6 @@ void printPrompt(struct FileNode *dir) {
         printf("%s > ", dir->name);
 }
 
-void readLine(char buffer[], int size) {
-    int index = 0;
-    char ch;
-
-    while(index < size - 1 && (ch = getchar()) != '\n' && ch != EOF) {
-        buffer[index++] = ch;
-    }
-
-    buffer[index] = '\0';
-}
-
 int main() {
     printf("$ ./vfs\n");
     initFileSystem();
@@ -435,7 +424,7 @@ int main() {
         } else if(stringCompare(command, "write") == 0) {
             scanf("%s", arg1);
             getchar();
-            readLine(arg2, sizeof(arg2));
+            fgets(arg2, sizeof(arg2), stdin);
             writeCommand(arg1, arg2);
         } else if(stringCompare(command, "read") == 0) {
             scanf("%s", arg1);
