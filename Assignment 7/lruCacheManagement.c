@@ -52,6 +52,110 @@ LRUCache* createCache(int capacity) {
     return cache;
 }
 
+void hashPut(LRUCache* cache, int key, Node* node) {
+    int hashIndex = hashFunction(key);
+    HashNode* bucket = cache->hashMap[hashIndex];
+
+    while(bucket != NULL) {
+        if(bucket->key == key) {
+            bucket->node = node;
+            return;
+        }
+        bucket = bucket->next;
+    }
+
+    HashNode* newNode = (HashNode*)malloc(sizeof(HashNode));
+    newNode->key = key;
+    newNode->node = node;
+    newNode->next = cache->hashMap[hashIndex];
+    cache->hashMap[hashIndex] = newNode;
+}
+
+Node* hashGet(LRUCache* cache, int key) {
+    int hashIndex = hashFunction(key);
+    HashNode* bucket = cache->hashMap[hashIndex];
+
+    while(bucket != NULL) {
+        if(bucket->key == key) {
+            return bucket->node;
+        }
+        bucket = bucket->next;
+    }
+    return NULL;
+}
+
+void hashRemove(LRUCache* cache, int key) {
+    int hashIndex = hashFunction(key);
+    HashNode* bucket = cache->hashMap[hashIndex];
+    HashNode* prev = NULL;
+
+    while(bucket != NULL) {
+        if(bucket->key == key) {
+            if(prev) {
+                prev->next = bucket->next;
+            } else {
+                cache->hashMap[hashIndex] = bucket->next;
+            }
+
+            free(bucket);
+            return;
+        }
+        prev = bucket;
+        bucket = bucket->next;
+    }
+}
+
+void moveToFront(LRUCache* cache, Node* node) {
+    if(node == cache->head) {
+        return;
+    }
+
+    if(node->prev) {
+        node->prev->next = node->next;
+    } else if(node->next) {
+        node->next->prev = node->prev;
+    }
+
+    if(node == cache->tail) {
+        cache->tail = node->prev;
+    }
+
+    node->prev = NULL;
+    node->next = cache->head;
+
+    if(cache->head) {
+        cache->head->prev = node;
+    }
+
+    cache->head = node;
+
+    if(!cache->tail) {
+        cache->tail = node;
+    }
+}
+
+void removeLRU(LRUCache* cache) {
+    if(cache->tail == NULL) {
+        return;
+    }
+
+    Node* removeNode = cache->tail;
+    hashRemove(cache, removeNode->key);
+
+    if(removeNode->prev) {
+        removeNode->prev->next = NULL;
+    } else {
+        cache->head = NULL;
+    }
+
+    cache->tail = removeNode->prev;
+
+    free(removeNode->value);
+    free(removeNode);
+
+    cache->size--;
+}
+
 int main() {
     char* command[50];
     LRUCache* cache = NULL;
