@@ -37,7 +37,7 @@ LRUCache* createCache(int capacity) {
 
     if(!cache) {
         printf("Memory allocation failed\n");
-        return;
+        return NULL;
     }
 
     cache->capacity = capacity;
@@ -105,33 +105,30 @@ void hashRemove(LRUCache* cache, int key) {
     }
 }
 
-void moveToFront(LRUCache* cache, Node* node) {
-    if(node == cache->head) {
+void moveToFront(LRUCache *cache, Node *node) {
+    if (node == cache->head)
         return;
-    }
 
-    if(node->prev) {
+    if (node->prev)
         node->prev->next = node->next;
-    } else if(node->next) {
-        node->next->prev = node->prev;
-    }
+    else
+        cache->head = node->next; 
 
-    if(node == cache->tail) {
-        cache->tail = node->prev;
-    }
+    if (node->next)
+        node->next->prev = node->prev;
+    else
+        cache->tail = node->prev; 
 
     node->prev = NULL;
     node->next = cache->head;
 
-    if(cache->head) {
+    if (cache->head)
         cache->head->prev = node;
-    }
 
     cache->head = node;
 
-    if(!cache->tail) {
+    if (cache->tail == NULL)
         cache->tail = node;
-    }
 }
 
 void removeLRU(LRUCache* cache) {
@@ -156,8 +153,84 @@ void removeLRU(LRUCache* cache) {
     cache->size--;
 }
 
+void insertAtFront(LRUCache* cache, int key, const char* value) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->key = key;
+    newNode->value = strdup(value);
+    newNode->next = cache->head;
+    newNode->prev = NULL;
+
+    if(cache->head) {
+        cache->head->prev = newNode;
+    }
+
+    cache->head = newNode;
+
+    if(cache->tail == NULL) {
+        cache->tail = newNode;
+    }
+
+    cache->size++;
+
+    hashPut(cache, key, newNode);
+}
+
+char* get(LRUCache* cache, int key) {
+    Node* node = hashGet(cache, key);
+
+    if(!node) {
+        return NULL;
+    }
+
+    moveToFront(cache, node);
+    return node->value;
+}
+
+void put(LRUCache* cache, int key, const char* value) {
+    Node* node = hashGet(cache, key);
+
+    if(node != NULL) {
+        free(node->value);
+        node->value = strdup(value);
+        moveToFront(cache, node);
+        return;
+    }
+
+    if(cache->size >= cache->capacity) {
+        removeLRU(cache);
+    }
+
+    insertAtFront(cache, key, value);
+}
+
+void freeCache(LRUCache* cache) {
+    if(!cache) {
+        return;
+    }
+
+    Node* current = cache->head;
+    while(current) {
+        Node* next = current->next;
+        free(current->value);
+        free(current);
+        current = next;
+    }
+
+    for(int index = 0; index < HASH_SIZE; index++) {
+        HashNode* bucket = cache->hashMap[index];
+
+        while(bucket) {
+            HashNode* next = bucket->next;
+            free(bucket);
+            bucket = next;
+        }
+    }
+
+    free(cache);
+}
+
 int main() {
-    char* command[50];
+    char command[50];
     LRUCache* cache = NULL;
 
     while(1) {
@@ -182,6 +255,7 @@ int main() {
                 printf("NULL\n");
             }
         } else if(strcmp(command, "exit") == 0) {
+            freeCache(cache);
             break;
         }
     }
