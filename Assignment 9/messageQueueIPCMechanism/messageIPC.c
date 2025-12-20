@@ -4,8 +4,8 @@
 #include <sys/msg.h>
 #include <sys/ipc.h>
 
-struct msg {
-    long type;
+struct message {
+    long mtype;
     int arr[5];
 };
 
@@ -25,8 +25,8 @@ int main() {
     key_t key = ftok("msgfile", 65);
     int msgId = msgget(key, 0666 | IPC_CREAT);
 
-    struct msg m;
-    m.type = 1;
+    struct message m;
+    m.mtype = 1;
 
     int arr[] = {8, 3, 6, 2, 1};
     memcpy(m.arr, arr, sizeof(arr));
@@ -34,7 +34,7 @@ int main() {
     if(fork() == 0) {
         msgrcv(msgId, &m, sizeof(m.arr), 1, 0);
         sort(m.arr, 5);
-        m.type = 2;
+        m.mtype = 2;
         msgsnd(msgId, &m, sizeof(m.arr), 0);
     } else {
         msgsnd(msgId, &m, sizeof(m.arr), 0);
