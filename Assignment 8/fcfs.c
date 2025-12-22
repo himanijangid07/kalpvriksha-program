@@ -68,35 +68,35 @@ char *trim(char *str) {
     return str;
 }
 
-void initQueue(Queue *q) {
-    q->head = q->tail = NULL;
-    q->size = 0;
+void initQueue(Queue *queue) {
+    queue->head = queue->tail = NULL;
+    queue->size = 0;
 }
 
-void enqueue(Queue *q, PCB *pcb) {
+void enqueue(Queue *queue, PCB *pcb) {
     pcb->next = NULL;
-    if (q->tail)
-        q->tail->next = pcb;
+    if (queue->tail)
+        queue->tail->next = pcb;
     else
-        q->head = pcb;
-    q->tail = pcb;
-    q->size++;
+        queue->head = pcb;
+    queue->tail = pcb;
+    queue->size++;
 }
 
-PCB *dequeue(Queue *q) {
-    if (!q->head)
+PCB *dequeue(Queue *queue) {
+    if (!queue->head)
         return NULL;
-    PCB *pcb = q->head;
-    q->head = pcb->next;
-    if (!q->head)
-        q->tail = NULL;
+    PCB *pcb = queue->head;
+    queue->head = pcb->next;
+    if (!queue->head)
+        queue->tail = NULL;
     pcb->next = NULL;
-    q->size--;
+    queue->size--;
     return pcb;
 }
 
-PCB *removeByPid(Queue *q, int pid) {
-    PCB *current = q->head, *prev = NULL;
+PCB *removeByPid(Queue *queue, int pid) {
+    PCB *current = queue->head, *prev = NULL;
     while (current)
     {
         if (current->pid == pid)
@@ -104,11 +104,11 @@ PCB *removeByPid(Queue *q, int pid) {
             if (prev)
                 prev->next = current->next;
             else
-                q->head = current->next;
-            if (current == q->tail)
-                q->tail = prev;
+                queue->head = current->next;
+            if (current == queue->tail)
+                queue->tail = prev;
             current->next = NULL;
-            q->size--;
+            queue->size--;
             return current;
         }
         prev = current;
@@ -159,11 +159,11 @@ void hashMapRemove(int pid) {
 }
 
 void addKillEvent(int pid, int time) {
-    KillEvent *k = malloc(sizeof(KillEvent));
-    k->pid = pid;
-    k->time = time;
-    k->next = kill_events;
-    kill_events = k;
+    KillEvent *kill = malloc(sizeof(KillEvent));
+    kill->pid = pid;
+    kill->time = time;
+    kill->next = kill_events;
+    kill_events = kill;
 }
 
 PCB *createPCB(char *name, int pid, int burst, int io_start, int io_dur) {
@@ -224,8 +224,9 @@ void applyKills(int tick, PCB **running) {
     KillEvent *current = kill_events, *prev = NULL;
     while (current) {
         if (current->time == tick) {
-            PCB *p = hashMapGet(current->pid);
-            if (p) {
+            PCB *pcb = hashMapGet(current->pid);
+            if (pcb)
+            {
                 if (*running && (*running)->pid == current->pid) {
                     (*running)->state = TERMINATED;
                     (*running)->killed_time = tick;
